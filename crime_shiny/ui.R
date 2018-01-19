@@ -21,36 +21,32 @@ r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
 
+
+
 shinyUI(navbarPage("Gapminder Dashboard",
                    ## Set the navbar structure
                    ## Code for the scatterplot tab.
-                   tabPanel("Scatter Plot",
-                            p("The purpose of this tab is customizing a scatterplot from the Gapminder dataset. There are two ways for customizing it: changing the data or changing the aesthetics. Play with both and see the results."),
-                            leafletOutput("mymap"),
-                            p(),
-                            actionButton("recalc", "New points"),
+                   tabPanel("Map",icon = icon("map", lib = "font-awesome"),
                             hr(),
                             fluidRow(
-                              column(6,
-                                     h3("Data"),
-                                     selectInput("continentInput", "Continent",
-                                                 choices = c("Americas", "Europe", "Asia","Africa","Oceania")),
-                                     checkboxInput("checkbox", "Smoothing", value = FALSE),
+                              column(4,
+                                     selectInput("crimeInput", "Crime Type",
+                                                 choices = c("All", "Homicide", "Rape","Robbery","Aggraved Assault")),
+                                     checkboxInput("checkbox", "Relative Statistics", value = FALSE)),
+                              column(4,
                                      sliderInput("yearInput", 
                                                  label = "Years",
-                                                 min = 1952, max = 2007, value = c(1952, 2007),step=5)),
-                              column(6,
-                                     h3("Aesthetics"),
-                                     radioButtons("shapeInput", "Shape",
-                                                  choices = c("Point", "Triangle", "Cross"),
-                                                  selected = "Point"),
-                                     colourInput("colorInput", "Select color", "#177368"),
-                                     numericInput("sizeInput", p("Size"), value = 4,min = 4, max = 10,step=1))
+                                                 min = 1952, max = 2007, value = c(1952, 2007),step=5)
+                                     ),
+                              column(4,
+                                     selectInput("stateInput", "State",
+                                                 choices = c("Americas", "Europe", "Asia","Africa","Oceania")))
                             ),
-                            hr(),
-                            plotOutput("distPlot")),
+                            leafletOutput("mymap"),
+                            p(),
+                            actionButton("recalc", "New points")),
                    ## Code for the table tab.
-                   tabPanel("Table",
+                   tabPanel("Comparison",icon = icon("bar-chart-o"),
                             p("The purpose of this tab is doing some dynamic filtering of the countries in the Gapminder dataset"),
                             fluidRow(
                               h3("Data"),

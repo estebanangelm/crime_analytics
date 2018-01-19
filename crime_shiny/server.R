@@ -22,20 +22,22 @@ library(stringr)
 
 crime_data <- read_csv('../data/crime_dataset.csv')
 city_info <- read_tsv('../data/city_data.tsv')
-crime_types <- data_frame(source= c("homs_sum","rape_sum","rob_sum","agg_ass_sum","violent_crime"),
-                          objective = c("Homicide","Rape","Robbery","Aggravated Assault","All"))
+city_info$lat <- as.numeric(city_info$lat)
+city_info$long <- as.numeric(city_info$long)
+crime_types <- data_frame(crime_type= c("homs_sum","rape_sum","rob_sum","agg_ass_sum","violent_crime"),
+                          type = c("Homicide","Rape","Robbery","Aggravated Assault","All"))
 
 ##Data wrangling
 
 crime_df <- crime_data %>% 
-  inner_join(city_info, by = c("ORI" = "code")) %>% 
-  select(-ORI,-department_name.x,-source,-url,-department_name.y,-search_name) %>% 
-  gather(crime_type,quantity,3:7)
-
-crime_df <- crime_data %>% 
   gather(crime_type,quantity,5:9) %>% 
-  select(ORI,year,total_pop,crime_type,quantity)
-
+  select(ORI,year,total_pop,crime_type,quantity) %>% 
+  inner_join(crime_types) %>% 
+  select(-crime_type) %>% 
+  inner_join(city_info,by=c("ORI"="code")) %>% 
+  select(-department_name,-search_name) %>% 
+  mutate(quantity_rel = quantity / total_pop * 100000) %>% 
+  filter(real_name != "National")
 
   
 
@@ -71,40 +73,16 @@ shinyServer(function(input, output) {
     }
   })
   
-  # Define server logic required to make the table.
-  output$table <- renderDataTable({
-    gap_table <- gapminder %>% 
-      select(country, continent, year, gdpPercap, lifeExp) %>% 
-      filter(continent == input$continentInput2,
-             year >= input$yearInput2[1],
-             year <= input$yearInput2[2])
-    gap_table})
-  
-  points <- eventReactive(input$recalc, {
-    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
-  }, ignoreNULL = FALSE)
-  
   # Define server logic required to make the map.
   
   output$mymap <- renderLeaflet({
-    leaflet() %>%
+    test <- crime_df %>% filter(year == "1975")
+    leaflet(data=test) %>%
       addProviderTiles(providers$Stamen.TonerLite,
                        options = providerTileOptions(noWrap = TRUE)
       ) %>%
-      setView(lng = -93.85, lat = 37.45, zoom = 4)
-  })
-  
-  observe({
-    crime_map <- crime_data %>% 
-      select(country, continent, year, gdpPercap, lifeExp) %>% 
-      filter(continent == input$continentInput2,
-             year >= input$yearInput2[1],
-             year <= input$yearInput2[2])
-    leafletProxy("map", data = zipdata) %>%
-      clearShapes() %>%
-      addCircles(~longitude, ~latitude, radius=radius, layerId=~zipcode,
-                 stroke=FALSE, fillOpacity=0.4, fillColor=pal(colorData)) %>%
-      addLegend("bottomleft", pal=pal, values=colorData, title=colorBy,
-                layerId="colorLegend")
+      setView(lng = -93.85, lat = 37.45, zoom = 4) %>% 
+      addTiles() %>%
+      addMarkers(~long, ~lat)
   })
 })
