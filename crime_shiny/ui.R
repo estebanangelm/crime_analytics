@@ -15,12 +15,20 @@ library(colourpicker)
 library(dplyr)
 library(ggplot2)
 library(magrittr)
+library(leaflet)
+
+r_colors <- rgb(t(col2rgb(colors()) / 255))
+names(r_colors) <- colors()
+
 
 shinyUI(navbarPage("Gapminder Dashboard",
                    ## Set the navbar structure
                    ## Code for the scatterplot tab.
                    tabPanel("Scatter Plot",
                             p("The purpose of this tab is customizing a scatterplot from the Gapminder dataset. There are two ways for customizing it: changing the data or changing the aesthetics. Play with both and see the results."),
+                            leafletOutput("mymap"),
+                            p(),
+                            actionButton("recalc", "New points"),
                             hr(),
                             fluidRow(
                               column(6,
