@@ -1,6 +1,6 @@
 department_name	code	real_name	state	search_name	lat	long
 Albuquerque, N.M.	NM00101	Albuquerque	NM	AlbuquerqueNM	35.0844909	-106.6511367
-Arlington, Texas	TX22001	Arlington	SD	ArlingtonSD	44.3644133	-97.1331212
+Arlington, Texas	TX22001	Arlington	TX	ArlingtonTX	32.735687	-97.1080656
 Atlanta	GAAPD00	Atlanta	GA	AtlantaGA	33.7489954	-84.3879824
 Aurora, Colo.	CO00101	Aurora	CO	AuroraCO	39.7294319	-104.8319195
 Austin, Texas	TX22701	Austin	TX	AustinTX	30.267153	-97.7430608
@@ -21,8 +21,8 @@ Fairfax County, Va.	VA02901	Fairfax County	VA	FairfaxVA	38.8462236	-77.3063733
 Fort Worth, Texas	TX22012	Fort Worth	TX	Fort WorthTX	32.725409	-97.3208496
 Fresno, Calif.	CA01005	Fresno	CA	FresnoCA	36.7477272	-119.7723661
 Honolulu	HI00200	Honolulu	HI	HonoluluHI	21.3069444	-157.8583333
-Houston	TXHPD00	Houston	PA	HoustonPA	40.2464593	-80.2114472
-Indianapolis	INIPD00	Indianapolis	OK	IndianapolisOK	35.5553871	-98.88636459
+Houston	TXHPD00	Houston	TX	HoustonTX	29.7632836	-95.3632715
+Indianapolis	INIPD00	Indianapolis	IN	IndianapolisIN	39.7683765	-86.1580423
 Jacksonville, Fla.	FL01602	Jacksonville	FL	JacksonvilleFL	30.3321838	-81.655651
 Kansas City, Mo.	MOKPD00	Kansas City	MO	Kansas CityMO	39.0997266	-94.5785667
 Las Vegas	NV00201	Las Vegas	NV	Las VegasNV	36.1749705	-115.137223

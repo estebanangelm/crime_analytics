@@ -22,6 +22,7 @@ names(r_colors) <- colors()
 
 city_info <- read_tsv('../data/city_data.tsv')
 state_list <- sort(append(unique(city_info$state),"ALL"))
+city_list <- sort(append(unique(city_info$real_name),"ALL"))
 
 shinyUI(navbarPage("Gapminder Dashboard",
                    ## Set the navbar structure
@@ -43,20 +44,28 @@ shinyUI(navbarPage("Gapminder Dashboard",
                                      selectInput("stateInput", "State",
                                                  choices = state_list))
                             ),
-                            leafletOutput("mymap")),
+                            hr(),
+                            leafletOutput("mymap"),
+                            hr()),
+                   
                    ## Code for the table tab.
                    tabPanel("Comparison",icon = icon("bar-chart-o"),
-                            p("The purpose of this tab is doing some dynamic filtering of the countries in the Gapminder dataset"),
+                            hr(),
                             fluidRow(
-                              h3("Data"),
-                              column(6,
-                                     selectInput("continentInput2", "Continent",
-                                                 choices = c("Americas", "Europe", "Asia","Africa","Oceania"))
-                              ),
-                              column(6,
+                              column(3,
+                                     selectInput("cityInput1", "City 1",
+                                                 choices = city_list),
+                                     checkboxInput("forCheckbox", "Include Forecast", value = FALSE)),
+                              column(3,
+                                     selectInput("cityInput1", "City 2",
+                                                 choices = city_list)),
+                              column(3,
+                                     selectInput("crimeInput2", "Crime Type",
+                                                 choices = c("All", "Homicide", "Rape","Robbery","Aggravated Assault"))),
+                              column(3,
                                      sliderInput("yearInput2", 
-                                                 label = "Years",
-                                                 min = 1952, max = 2007, value = c(1952, 2007),step=5)),
-                              dataTableOutput("table")
+                                                 label = "Year",
+                                                 min = 1995, max = 2015, value = 2007,step=1,animate=FALSE)
+                              )
                             ))
 ))
