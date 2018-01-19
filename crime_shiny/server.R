@@ -76,13 +76,27 @@ shinyServer(function(input, output) {
   # Define server logic required to make the map.
   
   output$mymap <- renderLeaflet({
-    test <- crime_df %>% filter(year == "1975")
+    test <- crime_df %>% 
+      filter(year == input$yearInput,type == input$crimeInput)
+    if(input$stateInput != "ALL"){
+      test <- test %>% filter(state==input$stateInput)
+    }
+    if(input$relCheckbox == TRUE){
+      test <- test %>% mutate(quantity = quantity_rel)
+    }
+    rule <- 25/max(test$quantity,na.rm=TRUE)
     leaflet(data=test) %>%
       addProviderTiles(providers$Stamen.TonerLite,
                        options = providerTileOptions(noWrap = TRUE)
       ) %>%
       setView(lng = -93.85, lat = 37.45, zoom = 4) %>% 
       addTiles() %>%
-      addMarkers(~long, ~lat)
+      addCircleMarkers(~long, 
+                       ~lat,
+                       popup = ~as.character(real_name), 
+                       label = ~as.character(real_name),
+                       radius = ~(quantity * rule),
+                       stroke = FALSE, 
+                       fillOpacity = 0.5)
   })
 })
