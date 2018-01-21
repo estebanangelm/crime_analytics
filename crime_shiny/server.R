@@ -17,6 +17,7 @@ library(leaflet)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(htmltools)
 
 ##Import dataset and additional table with cities information
 
@@ -93,7 +94,10 @@ shinyServer(function(input, output) {
       addTiles() %>%
       addCircleMarkers(~long, 
                        ~lat,
-                       popup = ~as.character(real_name), 
+                       popup = ~paste("<b>",real_name,"</b>",
+                                      "</br>",year,
+                                      "</br><b>Type:</b>",type,
+                                      "</br><b>Quantity:</b>",round(quantity)),
                        label = ~as.character(real_name),
                        radius = ~(quantity * rule),
                        stroke = FALSE, 
