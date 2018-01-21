@@ -1,10 +1,9 @@
-## Gapminder Dashboard - Server
+## Crime Analytics Dashboard - Server
 ## Author: Esteban Angel 2018
 
 ## Usage:
 
 ## This file performs all the data wrangling required for building the charts and tables.
-
 
 library(shiny)
 library(gapminder)
@@ -21,8 +20,8 @@ library(htmltools)
 
 ##Import dataset and additional table with cities information
 
-crime_data <- read_csv('../data/crime_dataset.csv')
-city_info <- read_tsv('../data/city_data.tsv')
+crime_data <- read_csv('./data/crime_dataset.csv')
+city_info <- read_tsv('./data/city_data.tsv')
 city_info$lat <- as.numeric(city_info$lat)
 city_info$long <- as.numeric(city_info$long)
 crime_types <- data_frame(crime_type= c("homs_sum","rape_sum","rob_sum","agg_ass_sum","violent_crime"),
@@ -47,7 +46,9 @@ forecast <- crime_df %>%
   group_by(real_name,type) %>% 
   summarize(f_qty_2016 = mean(quantity,na.rm=TRUE),
             f_pop_2016 = mean(total_pop,na.rm = TRUE),
-            f_rel_2016 = f_qty_2016/f_pop_2016*100000)
+            quantity_rel = f_qty_2016/f_pop_2016*100000,
+            year = 2016) %>% 
+  select(real_name,year,type,quantity_rel)
 
   
 shinyServer(function(input, output) {
@@ -80,6 +81,31 @@ shinyServer(function(input, output) {
                        stroke = FALSE, 
                        fillOpacity = 0.5)
   })
+  #Code for creating the phrase with kpi.
+  output$kpi1 <- renderUI({
+    test <- crime_df %>% 
+      filter(year == max(crime_df$year),
+             real_name %in% c(input$cityInput1,input$cityInput2),
+             type == "All") %>% 
+      arrange(quantity_rel)
+    tagList(
+      h3(paste(test$real_name[1],
+               " is safer than ",
+               test$real_name[2],
+               ". During the last year, ",
+               test$real_name[1],
+               " had ",
+               round(test$quantity_rel[1]),
+               " crimes per 100.000 people, while ",
+               test$real_name[2],
+               " had ",
+               round(test$quantity_rel[2]),
+               ". Scroll the following plots to find more details."
+      ))
+    )
+  })
+  
+  #Code for creating the plots.
   
   comparison <- crime_df %>% 
     group_by(real_name,year,type) %>% 
@@ -91,13 +117,27 @@ shinyServer(function(input, output) {
              year <= input$yearInput2[2],
              real_name == input$cityInput1)
     
-    ggplot(comparison %>% filter(real_name == input$cityInput1))+
-      geom_line(aes(x=year,y=total, color = type),size=2,alpha=0.7)+
-      scale_x_continuous("Year")+
-      scale_y_continuous("# of crimes per 100k people",limits = c(0,3000))+
-      ggtitle(paste("Relative Crime Statistics for ",input$cityInput1))+
-      theme_minimal()+
-      theme(legend.position = "bottom")
+    sub_forecast <- forecast %>% 
+      filter(real_name == input$cityInput1)
+    
+    if(input$forCheckbox == TRUE){
+      ggplot(comparison %>% filter(real_name == input$cityInput1))+
+        geom_line(aes(x=year,y=total, color = type),size=2,alpha=0.7)+
+        geom_point(data=sub_forecast,aes(x=year,y=quantity_rel,color=type),shape=12)+
+        scale_x_continuous("Year")+
+        scale_y_continuous("# of crimes per 100k people",limits = c(0,3000))+
+        ggtitle(paste("Relative Crime Statistics for ",input$cityInput1))+
+        theme_minimal()+
+        theme(legend.position = "bottom")
+    }else{
+      ggplot(comparison %>% filter(real_name == input$cityInput1))+
+        geom_line(aes(x=year,y=total, color = type),size=2,alpha=0.7)+
+        scale_x_continuous("Year")+
+        scale_y_continuous("# of crimes per 100k people",limits = c(0,3000))+
+        ggtitle(paste("Relative Crime Statistics for ",input$cityInput1))+
+        theme_minimal()+
+        theme(legend.position = "bottom")
+    }
   })
   
   output$distPlot2 <- renderPlot({
@@ -106,46 +146,76 @@ shinyServer(function(input, output) {
              year <= input$yearInput2[2],
              real_name == input$cityInput2)
     
+    sub_forecast <- forecast %>% 
+      filter(real_name == input$cityInput2)
     
-    ggplot(comparison %>% filter(real_name == input$cityInput2))+
-      geom_line(aes(x=year,y=total, color = type),size=2,alpha=0.7)+
-      scale_x_continuous("Year")+
-      scale_y_continuous("# of crimes per 100k people",limits = c(0,3000))+
-      ggtitle(paste("Relative Crime Statistics for ",input$cityInput2))+
-      theme_minimal()+
-      theme(legend.position = "bottom")
+    if(input$forCheckbox == TRUE){
+      ggplot(comparison %>% filter(real_name == input$cityInput2))+
+        geom_line(aes(x=year,y=total, color = type),size=2,alpha=0.7)+
+        geom_point(data=sub_forecast,aes(x=year,y=quantity_rel,color=type),shape=12)+
+        scale_x_continuous("Year")+
+        scale_y_continuous("# of crimes per 100k people",limits = c(0,3000))+
+        ggtitle(paste("Relative Crime Statistics for ",input$cityInput2))+
+        theme_minimal()+
+        theme(legend.position = "bottom")
+      
+    }else{
+      ggplot(comparison %>% filter(real_name == input$cityInput2))+
+        geom_line(aes(x=year,y=total, color = type),size=2,alpha=0.7)+
+        scale_x_continuous("Year")+
+        scale_y_continuous("# of crimes per 100k people",limits = c(0,3000))+
+        ggtitle(paste("Relative Crime Statistics for ",input$cityInput2))+
+        theme_minimal()+
+        theme(legend.position = "bottom")
+    }
   })
   
 
   
-  output$kpi1 <- renderUI({
-    tagList(
-      h3(paste(input$cityInput1)," is safer than ",input$cityInput2)
-    )
-  })
-  
-  crime_table <- crime_df %>% 
-    filter(year %in% c(2000,2001),
-           real_name == "Atlanta") %>% 
-    select(real_name,year,type,quantity_rel) %>% 
-    spread(year,quantity_rel)
-  
-  # Define server logic required to make the table.
+  # Define server logic required to make the tables.
   output$table1 <- renderTable({
-    crime_table_1 <- crime_df %>% 
-      filter(real_name == input$cityInput1,
-            year %in% c(input$yearInput2[1],input$yearInput2[2])) %>% 
-      select(real_name,year,type,quantity_rel) %>% 
-      spread(year,quantity_rel)
+    if (input$forCheckbox == TRUE){
+      sub_forecast <- forecast %>% 
+        filter(real_name == input$cityInput1)
+      
+      crime_table_1 <- crime_df %>% 
+        filter(real_name == input$cityInput1,
+               year %in% c(input$yearInput2[1],input$yearInput2[2])) %>% 
+        select(real_name,year,type,quantity_rel) %>% 
+        bind_rows(sub_forecast) %>% 
+        spread(year,quantity_rel)
+      
+      colnames(crime_table_1)[5] <- "Forecast 2016"
+    }else{
+      crime_table_1 <- crime_df %>% 
+        filter(real_name == input$cityInput1,
+               year %in% c(input$yearInput2[1],input$yearInput2[2])) %>% 
+        select(real_name,year,type,quantity_rel) %>% 
+        spread(year,quantity_rel)
+    }
     
     crime_table_1})
   
   output$table2 <- renderTable({
-    crime_table_2 <- crime_df %>% 
-      filter(real_name == input$cityInput2,
-             year %in% c(input$yearInput2[1],input$yearInput2[2])) %>% 
-      select(real_name,year,type,quantity_rel) %>% 
-      spread(year,quantity_rel)
-    
+    if (input$forCheckbox == TRUE){
+      sub_forecast <- forecast %>% 
+        filter(real_name == input$cityInput2)
+      
+      crime_table_2 <- crime_df %>% 
+        filter(real_name == input$cityInput2,
+               year %in% c(input$yearInput2[1],input$yearInput2[2])) %>% 
+        select(real_name,year,type,quantity_rel) %>% 
+        bind_rows(sub_forecast) %>% 
+        spread(year,quantity_rel)
+      
+      colnames(crime_table_2)[5] <- "Forecast 2016"
+    }else{
+      crime_table_2 <- crime_df %>% 
+        filter(real_name == input$cityInput2,
+               year %in% c(input$yearInput2[1],input$yearInput2[2])) %>% 
+        select(real_name,year,type,quantity_rel) %>% 
+        spread(year,quantity_rel)
+    }
+
     crime_table_2})
 })

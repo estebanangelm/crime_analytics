@@ -1,11 +1,10 @@
-## Gapminder Dashboard - UI
+## Crime Analytics Dashboard - UI
 ## Author: Esteban Angel 2018
 
 ## Usage:
 
 ## This file handles all the user interface of the Shiny app.
-## The app consists in a navigation bar with two tabs: a scatter plot and a table.
-## The idea is using different inputs to customize the outputs in both tabs.
+## The app consists in a navigation bar with two tabs: a map and a dashboard.
 
 
 ## Required libraries
@@ -21,7 +20,7 @@ library(readr)
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
-city_info <- read_tsv('../data/city_data.tsv')
+city_info <- read_tsv('./data/city_data.tsv')
 state_list <- sort(append(unique(city_info$state),"ALL"))
 city_list <- sort(append(unique(city_info$real_name),"ALL"))
 city_comparison <- sort(unique(city_info$real_name))
@@ -88,8 +87,7 @@ shinyUI(
             ),
             hr(),
             fluidRow(
-              splitLayout(cellWidths = c("50%"), tableOutput("table1"),tableOutput("table2"))
+              splitLayout(cellWidths = c("50%","50%"), tableOutput("table1"),tableOutput("table2"))
             )
-    ),
-    tabPanel("About",icon = icon("info", lib = "font-awesome"))
+    )
 ))
