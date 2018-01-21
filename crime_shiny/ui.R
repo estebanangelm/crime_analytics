@@ -24,12 +24,13 @@ names(r_colors) <- colors()
 city_info <- read_tsv('../data/city_data.tsv')
 state_list <- sort(append(unique(city_info$state),"ALL"))
 city_list <- sort(append(unique(city_info$real_name),"ALL"))
+city_comparison <- sort(unique(city_info$real_name))
 
 
 
 shinyUI(
   navbarPage(
-    header = tags$style(type="text/css", "@import url('//fonts.googleapis.com/css?family=Bungee'); .navbar-brand {font-family: 'Bungee', cursive; font-size: 15pt; font-weight: 500;line-height: 1.1;color: #ad1d28;}"),
+    header = tags$style(type="text/css", "@import url('//fonts.googleapis.com/css?family=Bungee'); .navbar-brand {font-family: 'Bungee', cursive; font-size: 15pt; font-weight: 500;color: #ad1d28;}"),
     title = "Crime Analytics",
     inverse = TRUE,
     ## Set the navbar structure
@@ -61,19 +62,34 @@ shinyUI(
             fluidRow(
               column(3,
                      selectInput("cityInput1", "City 1",
-                                 choices = city_list),
+                                 choices = city_comparison,
+                                 selected = "Boston")),
+              column(3,
+                     selectInput("cityInput2", "City 2",
+                                 choices = city_comparison,
+                                 selected = "New York")),
+              column(3,
                      checkboxInput("forCheckbox", "Include Forecast", value = FALSE)),
-              column(3,
-                     selectInput("cityInput1", "City 2",
-                                 choices = city_list)),
-              column(3,
-                     selectInput("crimeInput2", "Crime Type",
-                                 choices = c("All", "Homicide", "Rape","Robbery","Aggravated Assault"))),
               column(3,
                      sliderInput("yearInput2", 
                                  label = "Year",
-                                 min = 1995, max = 2015, value = 2007,step=1,animate=FALSE)
+                                 min = 1995, max = 2015, value = c(1975, 2015),step=1,animate=FALSE)
               )
-    )),
+            ), 
+            hr(),
+            fluidRow(
+              column(12,
+                     uiOutput("kpi1")
+                     )
+            ),
+            hr(),
+            fluidRow(
+              splitLayout(cellWidths = c("50%"), plotOutput("distPlot1"),plotOutput("distPlot2"))
+            ),
+            hr(),
+            fluidRow(
+              splitLayout(cellWidths = c("50%"), tableOutput("table1"),tableOutput("table2"))
+            )
+    ),
     tabPanel("About",icon = icon("info", lib = "font-awesome"))
 ))
