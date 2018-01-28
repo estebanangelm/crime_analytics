@@ -33,8 +33,8 @@ shinyUI(
     title = "Crime Analytics",
     inverse = TRUE,
     ## Set the navbar structure
-    ## Code for the scatterplot tab.
-    tabPanel("Map",icon = icon("map", lib = "font-awesome"),
+    ## Code for the Overview tab.
+    tabPanel("Overview",icon = icon("map", lib = "font-awesome"),
             hr(),
             fluidRow(
               column(4,
@@ -44,7 +44,7 @@ shinyUI(
               column(4,
                      sliderInput("yearInput", 
                                  label = "Year",
-                                 min = 1995, max = 2015, value = 2015,step=1,animate=TRUE,sep="")
+                                 min = 1995, max = 2015, value = 2014,step=1,animate=TRUE,sep="")
                      ),
               column(4,
                      uiOutput("stateControls"),
@@ -52,10 +52,15 @@ shinyUI(
                                  choices = state_list))
             ),
             hr(),
-            leafletOutput("mymap"),
+            fluidRow(
+              column(8,
+                     leafletOutput("mymap",height = "450px")),
+              column(width=4,
+                     fluidRow(plotOutput("bar_overview_1",height = "225px")),
+                     fluidRow(plotOutput("bar_overview_2",height = "225px")))),
             hr()),
     
-    ## Code for the table tab.
+    ## Code for the Comparison tab.
     tabPanel("Comparison",icon = icon("bar-chart-o"),
             hr(),
             fluidRow(
@@ -68,7 +73,7 @@ shinyUI(
                                  choices = city_comparison,
                                  selected = "New York")),
               column(3,
-                     checkboxInput("forCheckbox", "Include Forecast", value = FALSE)),
+                     checkboxInput("forCheckbox", "Include Forecast", value = TRUE)),
               column(3,
                      sliderInput("yearInput2", 
                                  label = "Year",

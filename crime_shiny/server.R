@@ -17,6 +17,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(htmltools)
+library(forcats)
 
 ##Import dataset and additional table with cities information
 
@@ -26,6 +27,8 @@ city_info$lat <- as.numeric(city_info$lat)
 city_info$long <- as.numeric(city_info$long)
 crime_types <- data_frame(crime_type= c("homs_sum","rape_sum","rob_sum","agg_ass_sum","violent_crime"),
                           type = c("Homicide","Rape","Robbery","Aggravated Assault","All"))
+
+exclude_list <- c("MD00301","CA01900","KY05680","FL01300")
 
 ##Data wrangling
 
@@ -81,6 +84,60 @@ shinyServer(function(input, output) {
                        stroke = FALSE, 
                        fillOpacity = 0.5)
   })
+  
+  # Code for bar chart next to the map
+  output$bar_overview_1 <- renderPlot({
+    data_bar <- crime_df %>% 
+      filter(year == input$yearInput,type == input$crimeInput)
+    if(input$relCheckbox == TRUE){
+      data_bar <- data_bar %>% mutate(quantity = quantity_rel)
+    }
+    
+    top_10 <- data_bar %>% 
+      group_by(real_name) %>% 
+      summarize(quantity = sum(quantity,na.rm=TRUE)) %>% 
+      arrange(desc(quantity)) %>% 
+      top_n(10) %>% 
+      mutate(type = "Top 10")
+    
+    
+    ggplot(top_10) +
+      geom_col(aes(x=fct_reorder(real_name,desc(quantity)),y=quantity),color="#A85042",fill="#A85042",alpha=0.7)+
+      ggtitle(paste("Top 10 most violent cities - by ",input$crimeInput))+
+      scale_y_continuous("# of crimes")+
+      scale_x_discrete("")+
+      theme_minimal()+
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
+    })
+  
+  # Code for bar chart next to the map
+  output$bar_overview_2 <- renderPlot({
+    data_bar <- crime_df %>% 
+      filter(year == input$yearInput,type == input$crimeInput)
+    if(input$relCheckbox == TRUE){
+      data_bar <- data_bar %>% mutate(quantity = quantity_rel)
+    }
+    
+    bot_10 <- data_bar %>% 
+      group_by(real_name) %>% 
+      summarize(quantity = sum(quantity,na.rm=TRUE)) %>% 
+      arrange(desc(quantity)) %>% 
+      top_n(-10) %>% 
+      mutate(type = "Bottom 10")
+    
+    
+    ggplot(bot_10) +
+      geom_col(aes(x=fct_reorder(real_name,desc(quantity)),y=quantity),color="blue",fill="blue",alpha=0.7)+
+      ggtitle(paste("Top 10 safest cities - by ",input$crimeInput))+
+      scale_y_continuous("# of crimes")+
+      scale_x_discrete("")+
+      theme_minimal()+
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
+  })
+      
+  
   #Code for creating the phrase with kpi.
   output$kpi1 <- renderUI({
     test <- crime_df %>% 
@@ -96,7 +153,7 @@ shinyServer(function(input, output) {
                test$real_name[1],
                " had ",
                round(test$quantity_rel[1]),
-               " crimes per 100.000 people, while ",
+               " crimes per 100,000 people, while ",
                test$real_name[2],
                " had ",
                round(test$quantity_rel[2]),
