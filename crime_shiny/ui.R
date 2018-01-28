@@ -66,21 +66,17 @@ shinyUI(
     tabPanel("Comparison",icon = icon("bar-chart-o"),
             hr(),
             fluidRow(
-              column(3,
+              column(4,
                      selectInput("cityInput1", "City 1",
                                  choices = city_comparison,
                                  selected = "Boston")),
-              column(3,
+              column(4,
                      selectInput("cityInput2", "City 2",
                                  choices = city_comparison,
                                  selected = "New York")),
-              column(3,
-                     checkboxInput("forCheckbox", "Include Forecast", value = TRUE)),
-              column(3,
-                     sliderInput("yearInput2", 
-                                 label = "Year",
-                                 min = 1985, max = 2015, value = c(1975, 2015),step=1,animate=FALSE,sep="")
-              )
+              column(4,
+                     checkboxInput("forCheckbox", "Include Forecast", value = TRUE),
+                     p("This is a 1 year forecast using a 3 year moving average. Only applies for 2016. It's represented by diamonds in the plot."))
             ), 
             hr(),
             fluidRow(
