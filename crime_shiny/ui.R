@@ -4,7 +4,7 @@
 ## Usage:
 
 ## This file handles all the user interface of the Shiny app.
-## The app consists in a navigation bar with two tabs: a map and a dashboard.
+## The app consists in a navigation bar with two tabs: a map and a dashboardx .
 
 
 ## Required libraries
@@ -44,7 +44,7 @@ shinyUI(
               column(4,
                      sliderInput("yearInput", 
                                  label = "Year",
-                                 min = 1995, max = 2015, value = 2007,step=1,animate=TRUE)
+                                 min = 1995, max = 2015, value = 2007,step=1,animate=TRUE,sep="")
                      ),
               column(4,
                      uiOutput("stateControls"),
@@ -72,7 +72,7 @@ shinyUI(
               column(3,
                      sliderInput("yearInput2", 
                                  label = "Year",
-                                 min = 1995, max = 2015, value = c(1975, 2015),step=1,animate=FALSE)
+                                 min = 1995, max = 2015, value = c(1975, 2015),step=1,animate=FALSE,sep="")
               )
             ), 
             hr(),
