@@ -85,7 +85,7 @@ shinyServer(function(input, output) {
                        fillOpacity = 0.5)
   })
   
-  # Code for bar chart next to the map
+  # Code for bar chart 1 next to the map
   output$bar_overview_1 <- renderPlot({
     data_bar <- crime_df %>% 
       filter(year == input$yearInput,type == input$crimeInput)
@@ -111,7 +111,7 @@ shinyServer(function(input, output) {
     
     })
   
-  # Code for bar chart next to the map
+  # Code for bar chart 2 next to the map
   output$bar_overview_2 <- renderPlot({
     data_bar <- crime_df %>% 
       filter(year == input$yearInput,type == input$crimeInput)

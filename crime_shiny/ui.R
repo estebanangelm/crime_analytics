@@ -16,6 +16,7 @@ library(ggplot2)
 library(magrittr)
 library(leaflet)
 library(readr)
+library(shinycssloaders)
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
@@ -40,7 +41,8 @@ shinyUI(
               column(4,
                      selectInput("crimeInput", "Crime Type",
                                  choices = c("All", "Homicide", "Rape","Robbery","Aggravated Assault")),
-                     checkboxInput("relCheckbox", "Relative Statistics", value = TRUE)),
+                     checkboxInput("relCheckbox", "Relative Statistics", value = TRUE),
+                     p("*Relative means that the crime indicators are normalized on a base of 100,000 people")),
               column(4,
                      sliderInput("yearInput", 
                                  label = "Year",
@@ -56,8 +58,8 @@ shinyUI(
               column(8,
                      leafletOutput("mymap",height = "450px")),
               column(width=4,
-                     fluidRow(plotOutput("bar_overview_1",height = "225px")),
-                     fluidRow(plotOutput("bar_overview_2",height = "225px")))),
+                     fluidRow(withSpinner(plotOutput("bar_overview_1",height = "225px"))),
+                     fluidRow(withSpinner(plotOutput("bar_overview_2",height = "225px"))))),
             hr()),
     
     ## Code for the Comparison tab.
@@ -88,7 +90,7 @@ shinyUI(
             ),
             hr(),
             fluidRow(
-              splitLayout(cellWidths = c("50%"), plotOutput("distPlot1"),plotOutput("distPlot2"))
+              splitLayout(cellWidths = c("50%"), withSpinner(plotOutput("distPlot1")),withSpinner(plotOutput("distPlot2")))
             ),
             hr(),
             fluidRow(
