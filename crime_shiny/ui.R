@@ -40,11 +40,11 @@ shinyUI(
               column(4,
                      selectInput("crimeInput", "Crime Type",
                                  choices = c("All", "Homicide", "Rape","Robbery","Aggravated Assault")),
-                     checkboxInput("relCheckbox", "Relative Statistics", value = FALSE)),
+                     checkboxInput("relCheckbox", "Relative Statistics", value = TRUE)),
               column(4,
                      sliderInput("yearInput", 
                                  label = "Year",
-                                 min = 1995, max = 2015, value = 2007,step=1,animate=TRUE,sep="")
+                                 min = 1995, max = 2015, value = 2015,step=1,animate=TRUE,sep="")
                      ),
               column(4,
                      uiOutput("stateControls"),
@@ -72,7 +72,7 @@ shinyUI(
               column(3,
                      sliderInput("yearInput2", 
                                  label = "Year",
-                                 min = 1995, max = 2015, value = c(1975, 2015),step=1,animate=FALSE,sep="")
+                                 min = 1985, max = 2015, value = c(1975, 2015),step=1,animate=FALSE,sep="")
               )
             ), 
             hr(),
